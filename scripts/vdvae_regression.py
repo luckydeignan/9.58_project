@@ -24,6 +24,8 @@ train_latents = train_latents[:10]
 
 ## Preprocessing fMRI
 
+# luckys changes
+
 train_fmri = train_fmri/300
 test_fmri = test_fmri/300
 
