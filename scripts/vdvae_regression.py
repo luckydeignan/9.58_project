@@ -22,6 +22,9 @@ train_latents = train_latents[:10]
 ## test change to see if you see this 
 ## here are changes 
 
+
+# here are more changes I am making 
+
 ## Preprocessing fMRI
 
 train_fmri = train_fmri/300
