@@ -19,6 +19,7 @@ test_fmri = np.load(test_path)
 
 train_fmri = train_fmri[:10]
 train_latents = train_latents[:10]
+## test change to see if you see this 
 
 ## Preprocessing fMRI
 
