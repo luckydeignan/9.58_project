@@ -17,6 +17,9 @@ train_fmri = np.load(train_path)
 test_path = 'data/processed_data/subj{:02d}/nsd_test_fmriavg_nsdgeneral_sub{}.npy'.format(sub,sub)
 test_fmri = np.load(test_path)
 
+train_fmri = train_fmri[:10]
+train_latents = train_latents[:10]
+
 ## Preprocessing fMRI
 
 train_fmri = train_fmri/300
