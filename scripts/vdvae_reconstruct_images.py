@@ -81,7 +81,7 @@ test_latents = []
 for i,x in enumerate(testloader):
   data_input, target = preprocess_fn(x)
   with torch.no_grad():
-        print(i*batch_size)
+        print(i*batch_size) 
         activations = ema_vae.encoder.forward(data_input)
         px_z, stats = ema_vae.decoder.forward(activations, get_latents=True)
         #recons = ema_vae.decoder.out_net.sample(px_z)
@@ -118,7 +118,8 @@ def sample_from_hier_latents(latents,sample_ids):
   layers_num=len(latents)
   sample_latents = []
   for i in range(layers_num):
-    sample_latents.append(torch.tensor(latents[i][sample_ids]).float().cuda())
+    # sample_latents.append(torch.tensor(latents[i][sample_ids]).float().cuda())
+    sample_latents.append(torch.tensor(latents[i][sample_ids]).float())
   return sample_latents
 
 #samples = []

@@ -161,8 +161,10 @@ def load_vaes(H, logprint):
         ema_vae.load_state_dict(vae.state_dict())
     ema_vae.requires_grad_(False)
 
-    vae = vae.cuda(H.local_rank)
-    ema_vae = ema_vae.cuda(H.local_rank)
+    # vae = vae.cuda(H.local_rank)
+    # ema_vae = ema_vae.cuda(H.local_rank)
+    vae = vae.to(device)
+    ema_vae = ema_vae.to(device)
 
     vae = DistributedDataParallel(vae, device_ids=[H.local_rank], output_device=H.local_rank)
 
