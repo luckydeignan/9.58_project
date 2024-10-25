@@ -17,9 +17,9 @@ train_fmri = np.load(train_path)
 test_path = 'data/processed_data/subj{:02d}/nsd_test_fmriavg_nsdgeneral_sub{}.npy'.format(sub,sub)
 test_fmri = np.load(test_path) ##
 
-train_fmri = train_fmri[:10]
-train_latents = train_latents[:10]
-## test change to see if you see this 
+# train_fmri = train_fmri[:10]
+# train_latents = train_latents[:10]
+## test change to see if you see this
 ## here are changes 
 
 
@@ -32,6 +32,8 @@ train_latents = train_latents[:10]
 train_fmri = train_fmri/300
 test_fmri = test_fmri/300
 
+print(train_fmri.shape, test_fmri.shape)
+import pdb; pdb.set_trace()
 
 norm_mean_train = np.mean(train_fmri, axis=0)
 norm_scale_train = np.std(train_fmri, axis=0, ddof=1)
