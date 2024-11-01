@@ -118,8 +118,8 @@ def sample_from_hier_latents(latents,sample_ids):
   layers_num=len(latents)
   sample_latents = []
   for i in range(layers_num):
-    # sample_latents.append(torch.tensor(latents[i][sample_ids]).float().cuda())
-    sample_latents.append(torch.tensor(latents[i][sample_ids]).float())
+    sample_latents.append(torch.tensor(latents[i][sample_ids]).float().cuda())
+    # sample_latents.append(torch.tensor(latents[i][sample_ids]).float())
   return sample_latents
 
 #samples = []
