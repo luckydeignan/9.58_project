@@ -11,9 +11,11 @@ import torchvision.transforms as T
 from torch.utils.data import Dataset, DataLoader
 import base64
 from io import BytesIO
-from openai import OpenAI
 import os
+from dotenv import load_dotenv
 import google.generativeai as genai
+
+load_dotenv()
 
 class ImageLoader(Dataset):
     def __init__(self, data_path):
@@ -44,8 +46,8 @@ def tensor_to_pil(tensor_image):
 
 def get_image_caption(tensor_image, prompt="Describe this image in 10 words"):
     """Get caption for an image using Gemini Vision"""
-    genai.configure(api_key='YOUR_GOOGLE_API_KEY')
-    model = genai.GenerativeModel('gemini-pro-vision')
+    genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
+    model = genai.GenerativeModel('gemini-1.5-flash')
     
     pil_image = tensor_to_pil(tensor_image)
     response = model.generate_content([prompt, pil_image])
