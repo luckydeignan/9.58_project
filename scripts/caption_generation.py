@@ -29,8 +29,8 @@ if torch.cuda.is_available():
     print("GPU Device Count:", torch.cuda.device_count())
 
 # Remove or comment out GPU setup
-# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-device = torch.device('cpu')  # Force CPU usage
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# device = torch.device('cpu')  # Force CPU usage
 print(f"Using device: {device}")
 
 
@@ -42,7 +42,7 @@ class ImageLoader(Dataset):
 
     def __getitem__(self, idx):
         img = Image.fromarray(self.im[idx])
-        img.save('data/trained_images/image_{}.png'.format(idx))
+        # img.save('data/trained_images/image_{}.png'.format(idx)) used as sanity check that captions were working
         img = T.functional.resize(img, (64, 64))
         img = torch.tensor(np.array(img)).float()
 
@@ -57,31 +57,33 @@ image_path = 'data/processed_data/subj{:02d}/nsd_train_stim_sub{}.npy'.format(su
 dataset = ImageLoader(data_path=image_path)
 dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
 
-def tensor_to_pil(tensor_image):
-    """Convert a PyTorch tensor to PIL Image"""
-    if tensor_image.dim() == 4:
-        tensor_image = tensor_image.squeeze(0)  # Remove batch dimension
-    transform = T.ToPILImage()
-    return transform(tensor_image.permute(2, 0, 1))
+# unnecessary code that was used when we had LLM analyze image
+# def tensor_to_pil(tensor_image):
+#     """Convert a PyTorch tensor to PIL Image"""
+#     if tensor_image.dim() == 4:
+#         tensor_image = tensor_image.squeeze(0)  # Remove batch dimension
+#     transform = T.ToPILImage()
+#     return transform(tensor_image.permute(2, 0, 1))
 
 
 # function that creates image caption based on the image itself and prompt for LLM
-# using Gemini 1.5 pro
+# using Gemini 1.5 flash
 # retry functionality in case calls per minute breaks quota
 @retry(
     stop=stop_after_attempt(4),
     wait=wait_fixed(60)
 )
-def get_image_caption_with_retry(tensor_image, prompt="Generate a 10-word caption summarizing the key details in this \
-image. The image will depict a common, everyday scene from an indoor or outdoor scene, \
- with common objects depicted. Only include the caption and no other words in your response."):
+def get_image_caption_with_retry(original_captions, prompt="Generate a caption with at least 10 words which summarizes the information given \
+in the following descriptions:"):
     try:
         genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
-        model = genai.GenerativeModel('gemini-1.5-pro')
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        for cap in original_captions:
+            if cap:
+                prompt = prompt + f"\ {cap}"
         
-        pil_image = tensor_to_pil(tensor_image)
-        response = model.generate_content([prompt, pil_image])
-        
+        response = model.generate_content(prompt)
+
         return response.text
     except Exception as e:
         print(f"Retrying due to error: {e}")
@@ -89,24 +91,24 @@ image. The image will depict a common, everyday scene from an indoor or outdoor 
 
 # calls caption_generation function
 # executes 24HR backoff if total requests per day API quota is reached
-def attempt_with_24hr_backoff(tensor_image):
+def attempt_with_24hr_backoff(original_captions):
     while True:
         try:
-            caption = get_image_caption_with_retry(tensor_image)
+            caption = get_image_caption_with_retry(original_captions)
             return caption  # If successful, return the result
         except Exception as e:
-            print(f"All attempts failed. Waiting 6 hours before retrying. Error: {e}")
+            print(f"All attempts failed. Waiting 24 hours before retrying. Error: {e}")
             time.sleep(86400)  # Wait for 24 hours before retrying again
 
-
+# load in caption numpy arrays (up to 5 descriptions per image)
+train_caps = np.load('data/processed_data/subj{:02d}/nsd_train_cap_sub{}.npy'.format(sub,sub))
 # create captions for 50 first images of training data
 captions = []
 for idx, img in enumerate(dataloader):
-    cap = attempt_with_24hr_backoff(img)
+    import pdb; pdb.set_trace()
+    cap = attempt_with_24hr_backoff(train_caps[idx])
     captions.append(cap)
-    print(f'image {idx}')
-    if idx==60:
-        break
+    print(f'image {idx}: {cap}')
 
 # create caption embeddings using general-purpose Hugging Face embeddings
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -120,4 +122,7 @@ reduced_embeddings = pca.fit_transform(embeddings)
 # Output shape will now be (num_sentences, 50)
 print("Original shape:", embeddings.shape)          # (num_sentences, 384)
 print("Reduced shape:", reduced_embeddings.shape)    # (num_sentences, 50)
+
+
+np.save('data/caption_embeddings/subj{:02d}/caption_bottleneck_embeddings_sub{}.npy'.format(sub,sub))
     

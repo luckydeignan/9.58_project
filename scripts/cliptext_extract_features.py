@@ -33,7 +33,7 @@ net.clip = net.clip.to(device)
    
 train_caps = np.load('data/processed_data/subj{:02d}/nsd_train_cap_sub{}.npy'.format(sub,sub)) 
 test_caps = np.load('data/processed_data/subj{:02d}/nsd_test_cap_sub{}.npy'.format(sub,sub))  
-
+# import pdb; pdb.set_trace()
 num_embed, num_features, num_test, num_train = 77, 768, len(test_caps), len(train_caps)
 
 train_clip = np.zeros((num_train,num_embed, num_features))
