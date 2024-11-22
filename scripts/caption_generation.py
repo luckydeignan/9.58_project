@@ -19,6 +19,8 @@ from sentence_transformers import SentenceTransformer
 from sklearn.decomposition import PCA
 from tenacity import retry, stop_after_attempt, wait_fixed
 import time
+from wordfreq import word_frequency
+truncated = True
 
 load_dotenv()
 
@@ -92,6 +94,8 @@ in the following descriptions:"):
 # calls caption_generation function
 # executes 24HR backoff if total requests per day API quota is reached
 def attempt_with_24hr_backoff(original_captions):
+    global truncated
+    truncated = False
     while True:
         try:
             caption = get_image_caption_with_retry(original_captions)
@@ -100,13 +104,34 @@ def attempt_with_24hr_backoff(original_captions):
             print(f"All attempts failed. Waiting 24 hours before retrying. Error: {e}")
             time.sleep(86400)  # Wait for 24 hours before retrying again
 
+# naive approach to caption generation -- taking 10 least-frequent words in caption
+def truncated_captions(original_captions):
+    global truncated
+    truncated = True
+    words = []
+    for cap in original_captions:
+        words = words + cap.split()
+    for i, w in enumerate(words):
+        if w[-1] == '.':
+            words[i] = w[:-1]
+
+    distinct_words = set(words)
+    sorted_words = sorted(distinct_words, key= lambda word: word_frequency(word, 'en', wordlist='best'), reverse=False)
+    final = ''
+    for i in range(min(len(sorted_words), 10)):
+        final = final + str(sorted_words[i]) + ' '
+
+    return final
+
 # load in caption numpy arrays (up to 5 descriptions per image)
 train_caps = np.load('data/processed_data/subj{:02d}/nsd_train_cap_sub{}.npy'.format(sub,sub))
 # create captions for 50 first images of training data
 captions = []
 for idx, img in enumerate(dataloader):
-    import pdb; pdb.set_trace()
-    cap = attempt_with_24hr_backoff(train_caps[idx])
+    
+    cap = truncated_captions(train_caps[idx])
+    #toggle this to indicate modality of caption generation
+    #cap = attempt_with_24hr_backoff(train_caps[idx])
     captions.append(cap)
     print(f'image {idx}: {cap}')
 
@@ -124,5 +149,10 @@ print("Original shape:", embeddings.shape)          # (num_sentences, 384)
 print("Reduced shape:", reduced_embeddings.shape)    # (num_sentences, 50)
 
 
-np.save('data/caption_embeddings/subj{:02d}/caption_bottleneck_embeddings_sub{}.npy'.format(sub,sub))
-    
+directory = 'data/caption_embeddings/subj{:02d}'.format(sub)
+os.makedirs(directory, exist_ok=True)
+
+if truncated:
+    np.save('{}/truncated_caption_bottleneck_embeddings_sub{}.npy'.format(directory,sub), reduced_embeddings)
+else:
+    np.save('{}/LLM_caption_bottleneck_embeddings_sub{}.npy'.format(directory,sub), reduced_embeddings)
