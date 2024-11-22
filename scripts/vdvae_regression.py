@@ -42,6 +42,7 @@ num_voxels, num_train, num_test = train_fmri.shape[1], len(train_fmri), len(test
 ## latents Features Regression
 print('Training latents Feature Regression')
 
+# look here
 reg = skl.Ridge(alpha=50000, max_iter=10000, fit_intercept=True)
 reg.fit(train_fmri, train_latents)
 pred_test_latent = reg.predict(test_fmri)
