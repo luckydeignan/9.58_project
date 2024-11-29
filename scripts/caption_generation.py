@@ -87,7 +87,7 @@ def get_image_caption_with_retry(original_captions, cap_length):
         prompt = "Generate a caption with 3 words which summarizes the information given \
     in the following descriptions:"
     else:
-        raiseException('invalid caption length')
+        raise('invalid caption length')
     try:
         genai.configure(api_key=os.getenv('GOOGLE_API_KEY'))
         model = genai.GenerativeModel('gemini-1.5-flash')
@@ -149,7 +149,7 @@ def truncated_captions(original_captions, cap_length='long'):
         for i in range(min(len(sorted_words), 3)):
             final = final + str(sorted_words[i]) + ' '
     else:
-        raiseException('Invalid cap_length parameter')
+        raise('Invalid cap_length parameter')
 
     return final
 
@@ -160,11 +160,16 @@ captions = []
 for idx, img in enumerate(dataloader):
     # cap_length parameter to toggle short/long captions
 
-    # cap = truncated_captions(train_caps[idx], cap_length='long')
+    #cap = truncated_captions(train_caps[idx], cap_length='short')
     #toggle lines above/below to indicate modality of caption generation
     cap = attempt_with_24hr_backoff(train_caps[idx], cap_length='long')
     captions.append(cap)
     print(f'image {idx}: {cap}')
+
+directory = 'data/caption_embeddings/subj{:02d}'.format(sub)
+os.makedirs(directory, exist_ok=True)
+
+np.save('{}/raw_captions_longer_LLM_sub{}.npy'.format(directory,sub), captions)
 
 # create caption embeddings using general-purpose Hugging Face embeddings
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -180,12 +185,11 @@ print("Original shape:", embeddings.shape)          # (num_sentences, 384)
 print("Reduced shape:", reduced_embeddings.shape)    # (num_sentences, 50)
 
 
-directory = 'data/caption_embeddings/subj{:02d}'.format(sub)
-os.makedirs(directory, exist_ok=True)
+
 
 if truncated:
     if shorter:
-        np.save('{}/shorter_truncated_caption_bottleneck_embeddings_sub{}.npy'.format(directory,sub), reduced_embeddings)
+        np.save('{}/test_shorter_truncated_caption_bottleneck_embeddings_sub{}.npy'.format(directory,sub), reduced_embeddings)
     else:
         np.save('{}/longer_truncated_caption_bottleneck_embeddings_sub{}.npy'.format(directory,sub), reduced_embeddings)
 else:
