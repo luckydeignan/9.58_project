@@ -2,3 +2,5 @@
 .env.local
 .env.*
 !.env.example.env
+huggingface_cache/
+huggingface_cache/*
