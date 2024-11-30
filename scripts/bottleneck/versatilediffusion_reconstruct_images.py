@@ -30,13 +30,12 @@ os.environ['TRANSFORMERS_CACHE'] = './huggingface_cache'
 # Parse arguments
 import argparse
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument("-sub", "--sub", help="Subject Number", default=1)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long'], required=True)
 parser.add_argument("-bs", "--bs", help="Batch Size", default=30)
 parser.add_argument("-diff_str", "--diff_str", help="Diffusion Strength", default=0.75)
 parser.add_argument("-mix_str", "--mix_str", help="Mixing Strength", default=0.4)
 args = parser.parse_args()
-sub = int(args.sub)
-assert sub == 1  # Only for subject 1
+cap_length = args.cap_length
 batch_size = int(args.bs)
 strength = float(args.diff_str)
 mixing = float(args.mix_str)
