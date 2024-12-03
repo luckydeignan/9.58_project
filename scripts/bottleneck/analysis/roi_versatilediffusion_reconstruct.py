@@ -22,7 +22,7 @@ from lib.cfg_helper import get_command_line_args, cfg_initiates, load_cfg_yaml
 import matplotlib.pyplot as plt
 from skimage.transform import resize, downscale_local_mean
 
-os.environ['HF_HOME'] = './roi_versatile_cache'
+os.environ['HF_HOME'] = './cache/roi_versatile_cache'
 
 import time
 start_time = time.time()

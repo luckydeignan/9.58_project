@@ -15,7 +15,6 @@ fi
 
 echo "Starting pipeline with cap_length: $CAP_LENGTH"
 
-# Run each script in sequence
 python scripts/bottleneck/brain_caption_regression.py -cap $CAP_LENGTH && \
 python scripts/bottleneck/caption_vdvae_regression.py -cap $CAP_LENGTH && \
 python scripts/bottleneck/vdvae_reconstruct_images.py -cap $CAP_LENGTH && \

@@ -22,12 +22,10 @@ from lib.cfg_helper import get_command_line_args, cfg_initiates, load_cfg_yaml
 import matplotlib.pyplot as plt
 from skimage.transform import resize, downscale_local_mean
 import time
-# import pdb
 
 start_time = time.time()
-os.environ['TRANSFORMERS_CACHE'] = './huggingface_cache'
+os.environ['TRANSFORMERS_CACHE'] = './cache/huggingface_cache'
 
-# Parse arguments
 import argparse
 parser = argparse.ArgumentParser(description='Argument Parser')
 parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long'], required=True)
@@ -67,29 +65,24 @@ cfgm = model_cfg_bank()(cfgm_name)
 net = get_model()(cfgm)
 sd = torch.load(pth, map_location='cpu')
 net.load_state_dict(sd, strict=False)
-# pdb.set_trace()
 
-# GPU assignments
 net.clip.cuda(0)
 net.autokl.cuda(0)
 net.autokl.half()
 sampler = sampler(net)
 
 print('Loading predicted features...')
-# Load predicted CLIP text and vision features from the brain → caption pipeline
+
 pred_text = np.load(f'data/predicted_features/subj01/nsd_cliptext_from_{cap_length}_captions_pred_sub01.npy')
 pred_text = torch.tensor(pred_text).half().cuda(1)
 pred_vision = np.load(f'data/predicted_features/subj01/nsd_clipvision_from_{cap_length}_captions_pred_sub1.npy')
 pred_vision = torch.tensor(pred_vision).half().cuda(1)
-# pdb.set_trace()
 
-# Generation parameters
 n_samples = 1
 ddim_steps = 50
 ddim_eta = 0
 scale = 7.5
 
-# Create output directory
 os.makedirs(f'results/versatile_diffusion_from_{cap_length}_captions/subj01', exist_ok=True)
 
 print('Generating images...')
@@ -100,26 +93,20 @@ for i in range(int(np.ceil(len(pred_vision)/batch_size))):
     
     batch_start = i * batch_size
     batch_end = min((i + 1) * batch_size, len(pred_vision))
-    # pdb.set_trace()
     
     for j in range(batch_start, batch_end):
-        # Load VDVAE generated image as initialization
         zim = Image.open(f'results/vdvae_from_{cap_length}_captions/subj01/{j}.png')
-        # pdb.set_trace()
 
         zim = regularize_image(zim)
         zin = zim*2 - 1
         zin = zin.unsqueeze(0).cuda(0).half()
 
-        # Before image generation
         init_latent = net.autokl_encode(zin)
-        # pdb.set_trace()
 
         sampler.make_schedule(ddim_num_steps=ddim_steps, ddim_eta=ddim_eta, verbose=False)
         t_enc = int(strength * ddim_steps)
         z_enc = sampler.stochastic_encode(init_latent, torch.tensor([t_enc]).to('cuda:0'))
         
-        # Prepare unconditional embeddings
         dummy_text = ''
         utx = net.clip_encode_text(dummy_text)
         utx = utx.cuda(1).half()
@@ -130,15 +117,12 @@ for i in range(int(np.ceil(len(pred_vision)/batch_size))):
         
         z_enc = z_enc.cuda(1)
 
-        # Get current batch predictions
         cim = pred_vision[j].unsqueeze(0)
         ctx = pred_text[j].unsqueeze(0)
         
-        # Set up model for generation
         sampler.model.model.diffusion_model.device='cuda:1'
         sampler.model.model.diffusion_model.half().cuda(1)
         
-        # Generate image
         z = sampler.decode_dc(
             x_latent=z_enc,
             first_conditioning=[uim, cim],
@@ -151,7 +135,6 @@ for i in range(int(np.ceil(len(pred_vision)/batch_size))):
             mixed_ratio=(1-mixing),
         )
         
-        # Decode and save
         z = z.cuda(0).half()
         x = net.autokl_decode(z)
         color_adj = 'None'

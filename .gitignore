@@ -13,3 +13,6 @@ clip_cache/*
 
 roi_versatile_cache/
 roi_versatile_cache/*
+
+cache/
+cache/*

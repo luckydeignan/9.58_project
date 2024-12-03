@@ -14,11 +14,9 @@ from model_utils import *
 from torch.utils.data import DataLoader, Dataset
 from PIL import Image
 import torchvision.transforms as T
-# import pdb
 import time
 start_time = time.time()
 
-# Parse arguments
 parser = argparse.ArgumentParser(description='Argument Parser')
 parser.add_argument("-bs", "--bs", help="Batch Size", default=30)
 parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long'], required=True)
@@ -28,7 +26,6 @@ batch_size = int(args.bs)
 
 print('Loading VDVAE model...')
 
-# VDVAE Hyperparameters
 H = {'image_size': 64, 'image_channels': 3, 'seed': 0, 'port': 29500, 
      'save_dir': './saved_models/test', 'data_root': './', 'desc': 'test',
      'hparam_sets': 'imagenet64', 'restore_path': 'imagenet64-iter-1600000-model.th',
@@ -52,19 +49,16 @@ H, preprocess_fn = set_up_data(H)
 ema_vae = load_vaes(H)
 
 print('Loading predicted VDVAE features...')
-# Load the predicted VDVAE features from the brain → caption → VDVAE pipeline
-pred_latents = np.load(f'data/predicted_features/subj01/nsd_vdvae_from_{cap_length}_captions_pred_sub01_31l.npy')
-# print("Loaded predicted latents shape:", pred_latents.shape)
 
-# Load a single test image to get reference latent structure
+pred_latents = np.load(f'data/predicted_features/subj01/nsd_vdvae_from_{cap_length}_captions_pred_sub01_31l.npy')
+
 image_path = 'data/processed_data/subj01/nsd_test_stim_sub1.npy'
 test_images = np.load(image_path).astype(np.uint8)
-single_image = test_images[0:1]  # Take first image
+single_image = test_images[0:1] 
 single_image = Image.fromarray(single_image[0])
 single_image = T.functional.resize(single_image, (64,64))
 single_image = torch.tensor(np.array(single_image)).float().unsqueeze(0)
 
-# Get reference latent structure
 data_input, _ = preprocess_fn(single_image)
 with torch.no_grad():
     activations = ema_vae.encoder.forward(data_input)
@@ -96,7 +90,6 @@ print("Transformed latents structure:")
 for i, lat in enumerate(input_latent):
     print(f"Layer {i} shape:", lat.shape)
 
-# Create output directory if it doesn't exist
 os.makedirs(f'results/vdvae_from_{cap_length}_captions/subj01', exist_ok=True)
 
 print('Generating images...')

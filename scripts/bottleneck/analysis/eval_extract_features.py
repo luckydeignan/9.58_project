@@ -28,8 +28,8 @@ parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', 
 args = parser.parse_args()
 cap_length = args.cap_length
 
-os.environ['TORCH_HOME'] = './torch_cache'  # Set cache directory to local folder
-os.environ['CLIP_CACHE_DIR'] = './clip_cache'  # Set CLIP cache directory
+os.environ['TORCH_HOME'] = './cache/torch_cache'  # Set cache directory to local folder
+os.environ['CLIP_CACHE_DIR'] = './cache/clip_cache'  # Set CLIP cache directory
 
 images_dir = 'data/nsddata_stimuli/test_images'
 feats_dir = 'data/eval_features/test_images'
