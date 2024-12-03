@@ -165,10 +165,10 @@ for idx, img in enumerate(dataloader):
         break
     # cap_length parameter to toggle short/long captions
 
-    cap = truncated_captions(train_caps[idx], cap_length='short')
+    #cap = truncated_captions(train_caps[idx], cap_length='short')
     #toggle lines above/below to indicate modality of caption generation
 
-    #cap = attempt_with_24hr_backoff(train_caps[idx], cap_length='long')
+    cap = attempt_with_24hr_backoff(train_caps[idx], cap_length='long')
     if idx < 800:
         train_captions.append(cap)
     else:
