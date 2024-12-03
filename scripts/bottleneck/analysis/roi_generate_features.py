@@ -6,7 +6,7 @@ start_time = time.time()
 
 import argparse
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 
@@ -40,16 +40,19 @@ roi_act[roi_act>0]=1
 roi_act[roi_act<0]=0
 
 # Generate VDVAE Features
-
-nsd_features = np.load('data/extracted_features/subj01/nsd_vdvae_features_31l.npz')
-train_latents = nsd_features['train_latents']
+if cap_length == 'preliminary':
+    nsd_features = np.load('data/extracted_features/subj01/nsd_vdvae_features_31l.npz')
+    full_latents = nsd_features['train_latents']
+    train_latents = full_latents[:800]
+else:
+    nsd_features = np.load('data/extracted_features/subj01/nsd_vdvae_features_31l.npz')
+    train_latents = nsd_features['train_latents']
 
 pred_vae = (roi_act @ reg_w.T) 
 pred_vae = pred_vae / (np.linalg.norm(pred_vae,axis=1).reshape((num_rois,1)) + 1e-8)
 pred_vae = pred_vae * 50 + reg_b
 
 pred_vae = (pred_vae - np.mean(pred_vae,axis=0)) / np.std(pred_vae,axis=0)
-
 pred_vae = pred_vae * np.std(train_latents,axis=0) + np.mean(train_latents,axis=0)
 pred_vae = pred_vae / np.linalg.norm(pred_vae,axis=1).reshape((num_rois,1))
 pred_vae = pred_vae * 80
@@ -73,7 +76,7 @@ np.save(f'data/predicted_features/subj01/nsd_cliptext_{cap_length}_roi_nsdgenera
 
 # Generate CLIP-Vision Features
 
-with open(f'data/regression_weights/subj01/{cap_length}_caption_to_clipvision_regression_weights.pkl'.format(sub),"rb") as f:
+with open(f'data/regression_weights/subj01/{cap_length}_caption_to_clipvision_regression_weights.pkl',"rb") as f:
     datadict = pickle.load(f)
     reg_w = datadict['weight']
     reg_b = datadict['bias']

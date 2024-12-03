@@ -33,7 +33,7 @@ start_time = time.time()
 
 import argparse
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
 parser.add_argument("-bs", "--bs",help="Batch Size",default=30)
 args = parser.parse_args()
 batch_size=int(args.bs)

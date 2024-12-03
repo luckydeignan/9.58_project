@@ -12,7 +12,7 @@ import time
 
 import argparse
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 
@@ -50,7 +50,12 @@ net_list = [
 
 feats_dir = f'data/eval_features_{cap_length}_captions/subj01'
 test_dir = 'data/eval_features/test_images'
-num_test = 982
+
+if cap_length == 'preliminary':
+    num_test = 200  # For preliminary case, evaluate images 800-999
+else:
+    num_test = 982  # Original number of test images
+
 distance_fn = sp.spatial.distance.correlation
 pairwise_corrs = []
 for (net_name,layer) in net_list:
@@ -75,9 +80,16 @@ from skimage.metrics import structural_similarity as ssim
         
 ssim_list = []
 pixcorr_list = []
-for i in range(982):
-    gen_image = Image.open(f'results/versatile_diffusion_from_{cap_length}_captions/subj01/{i}.png'.format(i)).resize((425,425))
-    gt_image = Image.open('data/nsddata_stimuli/test_images/{}.png'.format(i))
+for i in range(num_test):
+    gen_image = Image.open(f'results/versatile_diffusion_from_{cap_length}_captions/subj01/{i}.png').resize((425,425))
+    
+    if cap_length == 'preliminary':
+        # Load from training images dataset, using images 800-999
+        full_images = np.load('data/processed_data/subj01/nsd_train_stim_sub1.npy').astype(np.uint8)
+        gt_image = Image.fromarray(full_images[i + 800])
+    else:
+        gt_image = Image.open('data/nsddata_stimuli/test_images/{}.png'.format(i))
+    
     gen_image = np.array(gen_image)/255.0
     gt_image = np.array(gt_image)/255.0
     pixcorr_res = np.corrcoef(gt_image.reshape(1,-1), gen_image.reshape(1,-1))[0,1]

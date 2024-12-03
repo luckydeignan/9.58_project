@@ -2,14 +2,14 @@
 
 if [ "$#" -ne 1 ]; then
     echo "Usage: $0 <cap_length>"
-    echo "cap_length must be either 'short' or 'long'"
+    echo "cap_length must be either 'short' or 'long' or 'preliminary'"
     exit 1
 fi
 
 CAP_LENGTH=$1
 
-if [ "$CAP_LENGTH" != "short" ] && [ "$CAP_LENGTH" != "long" ]; then
-    echo "Error: cap_length must be either 'short' or 'long'"
+if [ "$CAP_LENGTH" != "short" ] && [ "$CAP_LENGTH" != "long" ] && [ "$CAP_LENGTH" != "preliminary" ]; then
+    echo "Error: cap_length must be either 'short' or 'long' or 'preliminary'"
     exit 1
 fi
 

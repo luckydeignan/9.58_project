@@ -5,21 +5,26 @@ import pickle
 import argparse
 
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 
 print("Loading caption embeddings")
-train_captions = np.load(f'data/caption_embeddings/subj01/{cap_length}er_truncated_caption_bottleneck_embeddings_sub1.npy')
 
 print("Loading fMRI data")
-train_path = 'data/processed_data/subj01/nsd_train_fmriavg_nsdgeneral_sub1.npy'
-train_fmri = np.load(train_path)
-test_path = 'data/processed_data/subj01/nsd_test_fmriavg_nsdgeneral_sub1.npy'
-test_fmri = np.load(test_path)
 
-train_fmri = train_fmri/300
-test_fmri = test_fmri/300
+if (cap_length == 'preliminary'):
+    # for preliminary data
+    train_captions = np.load(f'data/caption_embeddings/subj01/preliminary_TRAIN_LLM_caption_bottleneck_embeddings_sub1.npy')
+    full_fmri = np.load('data/processed_data/subj01/nsd_train_fmriavg_nsdgeneral_sub1.npy')
+    train_fmri = full_fmri[:800] 
+    test_fmri = full_fmri[800:1000]
+else:
+    train_captions = np.load(f'data/caption_embeddings/subj01/{cap_length}er_truncated_caption_bottleneck_embeddings_sub1.npy')
+    train_path = 'data/processed_data/subj01/nsd_train_fmriavg_nsdgeneral_sub1.npy'
+    train_fmri = np.load(train_path)
+    test_path = 'data/processed_data/subj01/nsd_test_fmriavg_nsdgeneral_sub1.npy'
+    test_fmri = np.load(test_path)
 
 norm_mean_train = np.mean(train_fmri, axis=0)
 norm_scale_train = np.std(train_fmri, axis=0, ddof=1)

@@ -5,7 +5,7 @@ import pickle
 import argparse
 
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 
@@ -13,10 +13,17 @@ print("Loading predicted captions")
 pred_captions = np.load(f'data/predicted_features/subj01/nsd_{cap_length}_captions_predtest_nsdgeneral.npy')
 
 print("Loading training captions")
-train_captions = np.load(f'data/caption_embeddings/subj01/{cap_length}er_truncated_caption_bottleneck_embeddings_sub1.npy')
+if (cap_length == 'preliminary'):
+    train_captions = np.load(f'data/caption_embeddings/subj01/preliminary_TRAIN_LLM_caption_bottleneck_embeddings_sub1.npy')
+else:
+    train_captions = np.load(f'data/caption_embeddings/subj01/{cap_length}er_truncated_caption_bottleneck_embeddings_sub1.npy')
 
 print("Loading CLIP vision features")
-train_clip = np.load('data/extracted_features/subj01/nsd_clipvision_train.npy')
+if (cap_length == 'preliminary'):
+    clip_features = np.load('data/extracted_features/subj01/nsd_clipvision_train.npy')
+    train_clip = clip_features[:800]
+else:
+    train_clip = np.load('data/extracted_features/subj01/nsd_clipvision_train.npy')
 
 print('Training Caption to CLIP Vision Regression')
 num_samples, num_embed, num_dim = train_clip.shape

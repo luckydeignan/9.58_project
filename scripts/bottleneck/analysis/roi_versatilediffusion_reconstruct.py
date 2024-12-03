@@ -22,7 +22,6 @@ from lib.cfg_helper import get_command_line_args, cfg_initiates, load_cfg_yaml
 import matplotlib.pyplot as plt
 from skimage.transform import resize, downscale_local_mean
 
-os.environ['HF_HOME'] = './cache/roi_versatile_cache'
 
 import time
 start_time = time.time()
@@ -31,12 +30,13 @@ import argparse
 parser = argparse.ArgumentParser(description='Argument Parser')
 parser.add_argument("-diff_str", "--diff_str",help="Diffusion Strength",default=0.75)
 parser.add_argument("-mix_str", "--mix_str",help="Mixing Strength",default=0.4)
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
 args = parser.parse_args()
 strength = float(args.diff_str)
 mixing = float(args.mix_str)
 cap_length = args.cap_length
 
+os.environ['HF_HOME'] = './cache/roi_versatile_cache'
 
 def regularize_image(x):
         BICUBIC = PIL.Image.Resampling.BICUBIC
@@ -97,10 +97,16 @@ if not os.path.exists(res_dir):
    os.makedirs(res_dir)
 
 torch.manual_seed(0)
-for im_id in range(len(pred_vision)):
 
+# Number of images to process
+if cap_length == 'preliminary':
+    num_images = 200  # For preliminary case (images 800-999)
+else:
+    num_images = len(pred_vision)  # Original number of images
+
+for im_id in range(num_images):
+    # Load VDVAE generated image as initialization
     zim = Image.open(f'results/vdvae_from_{cap_length}_captions/subj01/roi/{im_id}.png')
-   
     zim = regularize_image(zim)
     zin = zim*2 - 1
     zin = zin.unsqueeze(0).cuda(0).half()

@@ -24,16 +24,12 @@ import argparse
 import time
 
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 
-os.environ['TORCH_HOME'] = './cache/torch_cache'  # Set cache directory to local folder
-os.environ['CLIP_CACHE_DIR'] = './cache/clip_cache'  # Set CLIP cache directory
-
-images_dir = 'data/nsddata_stimuli/test_images'
-feats_dir = 'data/eval_features/test_images'
-
+os.environ['TORCH_HOME'] = './cache/torch_cache'  
+os.environ['CLIP_CACHE_DIR'] = './cache/clip_cache'  
 
 feats_dir = f'data/eval_features_{cap_length}_captions/subj01'
 images_dir = f'results/versatile_diffusion_from_{cap_length}_captions/subj01'
@@ -52,7 +48,11 @@ class batch_generator_external_images(Dataset):
            self.normalize = transforms.Normalize(mean=[0.48145466, 0.4578275, 0.40821073], std=[0.26862954, 0.26130258, 0.27577711])
         else:
            self.normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        self.num_test = 982
+        
+        if cap_length == 'preliminary':
+            self.num_test = 200  # For preliminary, we only want images 800-999
+        else:
+            self.num_test = 982  # Original number of test images
         
     def __getitem__(self,idx):
         img = Image.open('{}/{}{}.png'.format(self.data_path,self.prefix,idx))
@@ -133,7 +133,6 @@ for (net_name,layer) in net_list:
     
     with torch.no_grad():
         for i,x in enumerate(loader):
-            # print(i*batchsize)
             x = x.to(device)
             _ = net(x)
     if net_name == 'clip':
