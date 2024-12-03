@@ -4,3 +4,12 @@
 !.env.example.env
 huggingface_cache/
 huggingface_cache/*
+
+torch_cache/
+torch_cache/*
+
+clip_cache/
+clip_cache/*
+
+roi_versatile_cache/
+roi_versatile_cache/*
