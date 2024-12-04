@@ -58,6 +58,21 @@ else:
 
 distance_fn = sp.spatial.distance.correlation
 pairwise_corrs = []
+
+# Initialize results_dict before the network evaluation loop
+results_dict = {
+    'network_metrics': {
+        'names': [net[0] + '_' + str(net[1]) for net in net_list],
+        'pairwise_correlations': [],
+        'distances': []
+    },
+    'image_metrics': {},  # Will be populated later
+    'metadata': {
+        'caption_length': cap_length,
+        'num_test_images': num_test
+    }
+}
+
 for (net_name,layer) in net_list:
     file_name = '{}/{}_{}.npy'.format(test_dir,net_name,layer)
     gt_feat = np.load(file_name)
@@ -70,7 +85,9 @@ for (net_name,layer) in net_list:
     
     print(net_name,layer)
     if net_name in ['efficientnet','swav']:
-        print('distance: ',np.array([distance_fn(gt_feat[i],eval_feat[i]) for i in range(num_test)]).mean())
+        distance = np.array([distance_fn(gt_feat[i],eval_feat[i]) for i in range(num_test)]).mean()
+        results_dict['network_metrics']['distances'].append(distance)
+        print('distance: ', distance)
     else:
         pairwise_corrs.append(pairwise_corr_all(gt_feat[:num_test],eval_feat[:num_test])[0])
         print('pairwise corr: ',pairwise_corrs[-1])
@@ -104,8 +121,30 @@ pixcorr_list = np.array(pixcorr_list)
 print('PixCorr: {}'.format(pixcorr_list.mean()))
 print('SSIM: {}'.format(ssim_list.mean()))
 
+# After all metrics are calculated, update the image metrics
+results_dict['image_metrics'] = {
+    'pixel_correlation_mean': float(pixcorr_list.mean()),
+    'ssim_mean': float(ssim_list.mean()),
+    'pixel_correlation_all': pixcorr_list.tolist(),
+    'ssim_all': ssim_list.tolist()
+}
+
 end_time = time.time()
 execution_time = end_time - start_time
+
+# Now update the results dict with the execution time
+results_dict['metadata']['execution_time_seconds'] = execution_time
+
+# Save results
+import json
+output_dir = f'results/evaluation_metrics_{cap_length}_captions'
+os.makedirs(output_dir, exist_ok=True)
+output_file = os.path.join(output_dir, f'reconstruction_metrics_subj01.json')
+
+with open(output_file, 'w') as f:
+    json.dump(results_dict, f, indent=4)
+
+print(f"\nResults saved to: {output_file}")
 print(f"\nTotal execution time for evaluate reconstruction {cap_length}: {execution_time:.2f} seconds ({execution_time/60:.2f} minutes)")
 print('='*50)
 print('  ')
