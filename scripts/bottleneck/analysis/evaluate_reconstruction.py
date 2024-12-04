@@ -101,11 +101,9 @@ for i in range(num_test):
     gen_image = Image.open(f'results/versatile_diffusion_from_{cap_length}_captions/subj01/{i}.png').resize((425,425))
     
     if cap_length == 'preliminary':
-        # Load from training images dataset, using images 800-999
-        full_images = np.load('data/processed_data/subj01/nsd_train_stim_sub1.npy').astype(np.uint8)
-        gt_image = Image.fromarray(full_images[i + 800])
+        gt_image = Image.open(f'data/nsddata_stimuli/test_images/{i + 800}.png')
     else:
-        gt_image = Image.open('data/nsddata_stimuli/test_images/{}.png'.format(i))
+        gt_image = Image.open(f'data/nsddata_stimuli/test_images/{i}.png')
     
     gen_image = np.array(gen_image)/255.0
     gt_image = np.array(gt_image)/255.0
