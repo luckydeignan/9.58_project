@@ -42,22 +42,22 @@ if cap_length == 'preliminary':
 else:
     train_captions = np.load(f'data/caption_embeddings/subj01/{cap_length}er_truncated_caption_bottleneck_embeddings_sub1.npy')
 
-print('Training ROI to Caption Regression')
-print(f"ROI shape: {roi_act.shape}, Caption shape: {train_captions.shape}")
-print(f"First caption shape: {train_captions[0].shape}")
-print(f"ROI.T shape: {roi_act.T.shape}")
+# print('Training ROI to Caption Regression')
+# print(f"ROI shape: {roi_act.shape}, Caption shape: {train_captions.shape}")
+# print(f"First caption shape: {train_captions[0].shape}")
+# print(f"ROI.T shape: {roi_act.T.shape}")
 
 # Train regression from ROI space (15724) to caption space (50)
 reg = skl.Ridge(alpha=50000, max_iter=10000, fit_intercept=True)
 
 # Reshape ROI data to match caption dimensions
 roi_expanded = np.repeat(roi_act, train_captions.shape[0] // roi_act.shape[0] + 1, axis=0)[:train_captions.shape[0]]
-print(f"Expanded ROI shape: {roi_expanded.shape}")  # Should be (8859, 15724)
+# print(f"Expanded ROI shape: {roi_expanded.shape}")  # Should be (8859, 15724)
 
 reg.fit(roi_expanded, train_captions)  # Now dimensions match
 
-print(f"Regression coef shape: {reg.coef_.shape}")
-print(f"Regression intercept shape: {reg.intercept_.shape}")
+# print(f"Regression coef shape: {reg.coef_.shape}")
+# print(f"Regression intercept shape: {reg.intercept_.shape}")
 
 datadict = {
     'weight': reg.coef_,  # Should be (50, 15724)
@@ -71,6 +71,3 @@ end_time = time.time()
 execution_time = end_time - start_time
 print(f"\nTotal execution time for ROI caption regression {cap_length}: {execution_time:.2f} seconds ({execution_time/60:.2f} minutes)")
 print('='*50)
-print('  ')
-print('  ')
-print('  ')

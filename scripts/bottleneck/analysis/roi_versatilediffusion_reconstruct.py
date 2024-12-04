@@ -99,10 +99,7 @@ if not os.path.exists(res_dir):
 torch.manual_seed(0)
 
 # Number of images to process
-if cap_length == 'preliminary':
-    num_images = 200  # For preliminary case (images 800-999)
-else:
-    num_images = len(pred_vision)  # Original number of images
+num_images = len(pred_vision)
 
 for im_id in range(num_images):
     # Load VDVAE generated image as initialization
@@ -180,8 +177,5 @@ for im_id in range(num_images):
 
 end_time = time.time()
 execution_time = end_time - start_time
-print(f"\nTotal execution time for evaluate reconstruction {cap_length}: {execution_time:.2f} seconds ({execution_time/60:.2f} minutes)")
+print(f"\nTotal execution time for roi versatile diffusion {cap_length}: {execution_time:.2f} seconds ({execution_time/60:.2f} minutes)")
 print('='*50)
-print('  ')
-print('  ')
-print('  ')

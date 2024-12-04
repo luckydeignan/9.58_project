@@ -151,6 +151,3 @@ with open(output_file, 'w') as f:
 print(f"\nResults saved to: {output_file}")
 print(f"\nTotal execution time for evaluate reconstruction {cap_length}: {execution_time:.2f} seconds ({execution_time/60:.2f} minutes)")
 print('='*50)
-print('  ')
-print('  ')
-print('  ')
