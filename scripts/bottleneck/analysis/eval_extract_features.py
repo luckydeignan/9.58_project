@@ -151,6 +151,3 @@ end_time = time.time()
 execution_time = end_time - start_time
 print(f"\nTotal execution time for eval extract features {cap_length}: {execution_time:.2f} seconds ({execution_time/60:.2f} minutes)")
 print('='*50)
-print('  ')
-print('  ')
-print('  ')

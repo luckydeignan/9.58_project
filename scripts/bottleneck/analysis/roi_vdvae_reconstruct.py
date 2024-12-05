@@ -144,8 +144,5 @@ for i in range(1):
 
 end_time = time.time()
 execution_time = end_time - start_time
-print(f"\nTotal execution time for evaluate reconstruction {cap_length}: {execution_time:.2f} seconds ({execution_time/60:.2f} minutes)")
+print(f"\nTotal execution time for roi vdvae reconstruct {cap_length}: {execution_time:.2f} seconds ({execution_time/60:.2f} minutes)")
 print('='*50)
-print('  ')
-print('  ')
-print('  ')

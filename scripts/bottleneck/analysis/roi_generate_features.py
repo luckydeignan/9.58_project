@@ -17,8 +17,8 @@ with open(f'data/regression_weights/subj01/{cap_length}_caption_to_vdvae_regress
     datadict = pickle.load(f)
     reg_w = datadict['weight']
     reg_b = datadict['bias']
-print(f"reg_w shape: {reg_w.shape}")
-print(f"reg_b shape: {reg_b.shape}")
+# print(f"reg_w shape: {reg_w.shape}")
+# print(f"reg_b shape: {reg_b.shape}")
 
 # Add this section to load train_latents
 print("Loading VDVAE features")
@@ -28,7 +28,7 @@ if cap_length == 'preliminary':
     train_latents = full_latents[:800]  # Use first 800 samples for preliminary
 else:
     train_latents = nsd_features['train_latents']
-print(f"train_latents shape: {train_latents.shape}")
+# print(f"train_latents shape: {train_latents.shape}")
 
 roi_dir = f'data/processed_data/subj01/roi_{cap_length}_captions'
 num_rois = 13
@@ -36,7 +36,7 @@ roi_act = np.zeros((num_rois, 15724)).astype(np.float32)
 
 # Load first ROI to check shape
 temp_roi = np.load(f"{roi_dir}/floc-faces.npy")
-print(f"Single ROI shape: {temp_roi.shape}")
+# print(f"Single ROI shape: {temp_roi.shape}")
 
 # Load ROIs
 roi_act[0] = np.load(f"{roi_dir}/floc-faces.npy")
@@ -55,35 +55,35 @@ roi_act[12] = np.load(f"{roi_dir}/ecc40p.npy")
 
 roi_act[roi_act>0]=1
 roi_act[roi_act<0]=0
-print(f"roi_act shape after loading: {roi_act.shape}")
+# print(f"roi_act shape after loading: {roi_act.shape}")
 
 # Load ROI to caption weights
 with open(f'data/regression_weights/subj01/{cap_length}_roi_to_caption_weights.pkl',"rb") as f:
     roi_datadict = pickle.load(f)
     roi_w = roi_datadict['weight']
     roi_b = roi_datadict['bias']
-print(f"roi_w shape: {roi_w.shape}")
-print(f"roi_b shape: {roi_b.shape}")
+# print(f"roi_w shape: {roi_w.shape}")
+# print(f"roi_b shape: {roi_b.shape}")
 
 # First map ROI to caption space
 caption_space = roi_act @ roi_w.T + roi_b
-print(f"caption_space shape: {caption_space.shape}")
+# print(f"caption_space shape: {caption_space.shape}")
 
 # Then map to VDVAE space using existing weights
 pred_vae = caption_space @ reg_w.T
-print(f"initial pred_vae shape: {pred_vae.shape}")
+# print(f"initial pred_vae shape: {pred_vae.shape}")
 
 # Normalize
 pred_vae = pred_vae / (np.linalg.norm(pred_vae,axis=1).reshape((num_rois,1)) + 1e-8)
 pred_vae = pred_vae * 50 + reg_b
 
 pred_vae = (pred_vae - np.mean(pred_vae,axis=0)) / np.std(pred_vae,axis=0)
-print(f"pred_vae after normalization shape: {pred_vae.shape}")
+# print(f"pred_vae after normalization shape: {pred_vae.shape}")
 
 pred_vae = pred_vae * np.std(train_latents,axis=0) + np.mean(train_latents,axis=0)
 pred_vae = pred_vae / np.linalg.norm(pred_vae,axis=1).reshape((num_rois,1))
 pred_vae = pred_vae * 80
-print(f"final pred_vae shape: {pred_vae.shape}")
+# print(f"final pred_vae shape: {pred_vae.shape}")
 np.save(f'data/predicted_features/subj01/nsd_vdvae_from_{cap_length}_captions_pred_sub01_31l.npy',pred_vae)
 
 # Generate CLIP-Text Features
@@ -123,6 +123,3 @@ end_time = time.time()
 execution_time = end_time - start_time
 print(f"\nTotal execution time for ROI feature generation {cap_length}: {execution_time:.2f} seconds ({execution_time/60:.2f} minutes)")
 print('='*50)
-print('  ')
-print('  ')
-print('  ')
