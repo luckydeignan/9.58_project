@@ -16,15 +16,13 @@ print("Loading fMRI data")
 if (cap_length == 'LLM'):
     # for LLM data
     train_captions = np.load(f'data/caption_embeddings/subj01/final_LLM_caption_bottleneck_embeddings_sub1.npy')
-    full_fmri = np.load('data/processed_data/subj01/nsd_train_fmriavg_nsdgeneral_sub1.npy')
-    train_fmri = full_fmri[:800] 
-    test_fmri = full_fmri[800:1000]
 else:
     train_captions = np.load(f'data/caption_embeddings/subj01/{cap_length}er_truncated_caption_bottleneck_embeddings_sub1.npy')
-    train_path = 'data/processed_data/subj01/nsd_train_fmriavg_nsdgeneral_sub1.npy'
-    train_fmri = np.load(train_path)
-    test_path = 'data/processed_data/subj01/nsd_test_fmriavg_nsdgeneral_sub1.npy'
-    test_fmri = np.load(test_path)
+
+train_path = 'data/processed_data/subj01/nsd_train_fmriavg_nsdgeneral_sub1.npy'
+train_fmri = np.load(train_path)
+test_path = 'data/processed_data/subj01/nsd_test_fmriavg_nsdgeneral_sub1.npy'
+test_fmri = np.load(test_path)
 
 norm_mean_train = np.mean(train_fmri, axis=0)
 norm_scale_train = np.std(train_fmri, axis=0, ddof=1)
