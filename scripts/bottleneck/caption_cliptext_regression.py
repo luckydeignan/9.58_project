@@ -5,7 +5,7 @@ import pickle
 import argparse
 
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'LLM'], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 
@@ -13,17 +13,17 @@ print("Loading predicted captions")
 pred_captions = np.load(f'data/predicted_features/subj01/nsd_{cap_length}_captions_predtest_nsdgeneral.npy')
 
 print("Loading training captions")
-if (cap_length == 'preliminary'):
-    train_captions = np.load(f'data/caption_embeddings/subj01/preliminary_TRAIN_LLM_caption_bottleneck_embeddings_sub1.npy')
+if (cap_length == 'LLM'):
+    train_captions = np.load(f'data/caption_embeddings/subj01/final_LLM_caption_bottleneck_embeddings_sub1.npy')
 else:
     train_captions = np.load(f'data/caption_embeddings/subj01/{cap_length}er_truncated_caption_bottleneck_embeddings_sub1.npy')
 
 print("Loading CLIP text features")
-if (cap_length == 'preliminary'):
-    clip_features = np.load(f'data/extracted_features/subj01/nsd_cliptext_train.npy')
-    train_clip = clip_features[:800]
-else:
-    train_clip = np.load(f'data/extracted_features/subj01/nsd_cliptext_train.npy')
+# if (cap_length == 'LLM'):
+#     clip_features = np.load(f'data/extracted_features/subj01/nsd_cliptext_train.npy')
+#     train_clip = clip_features[:800]
+# else:
+train_clip = np.load(f'data/extracted_features/subj01/nsd_cliptext_train.npy')
 
 print('Training Caption to CLIP Text Regression')
 num_samples, num_embed, num_dim = train_clip.shape

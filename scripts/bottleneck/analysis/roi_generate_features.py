@@ -6,7 +6,7 @@ start_time = time.time()
 
 import argparse
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'LLM'], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 
@@ -23,11 +23,11 @@ with open(f'data/regression_weights/subj01/{cap_length}_caption_to_vdvae_regress
 # Add this section to load train_latents
 print("Loading VDVAE features")
 nsd_features = np.load('data/extracted_features/subj01/nsd_vdvae_features_31l.npz')
-if cap_length == 'preliminary':
-    full_latents = nsd_features['train_latents']
-    train_latents = full_latents[:800]  # Use first 800 samples for preliminary
-else:
-    train_latents = nsd_features['train_latents']
+# if cap_length == 'preliminary':
+#     full_latents = nsd_features['train_latents']
+#     train_latents = full_latents[:800]  # Use first 800 samples for preliminary
+# else:
+train_latents = nsd_features['train_latents']
 # print(f"train_latents shape: {train_latents.shape}")
 
 roi_dir = f'data/processed_data/subj01/roi_{cap_length}_captions'

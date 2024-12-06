@@ -10,7 +10,7 @@ start_time = time.time()
 
 import argparse
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'LLM'], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 

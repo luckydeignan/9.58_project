@@ -24,7 +24,7 @@ import argparse
 import time
 
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'LLM'], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 
@@ -49,10 +49,10 @@ class batch_generator_external_images(Dataset):
         else:
            self.normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         
-        if cap_length == 'preliminary':
-            self.num_test = 200  # For preliminary, we only want images 800-999
-        else:
-            self.num_test = 982  # Original number of test images
+        # if cap_length == 'preliminary':
+        #     self.num_test = 200  # For preliminary, we only want images 800-999
+        # else:
+        self.num_test = 982  # Original number of test images
         
     def __getitem__(self,idx):
         img = Image.open('{}/{}{}.png'.format(self.data_path,self.prefix,idx))

@@ -19,7 +19,7 @@ start_time = time.time()
 
 parser = argparse.ArgumentParser(description='Argument Parser')
 parser.add_argument("-bs", "--bs", help="Batch Size", default=30)
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'LLM'], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 batch_size = int(args.bs)
@@ -52,11 +52,11 @@ print('Loading predicted VDVAE features...')
 
 pred_latents = np.load(f'data/predicted_features/subj01/nsd_vdvae_from_{cap_length}_captions_pred_sub01_31l.npy')
 
-if cap_length == 'preliminary':
-    full_images = np.load('data/processed_data/subj01/nsd_train_stim_sub1.npy').astype(np.uint8)
-    test_images = full_images[800:1000]  # Take images 800-999 for testing
-else:
-    test_images = np.load('data/processed_data/subj01/nsd_test_stim_sub1.npy').astype(np.uint8)
+# if cap_length == 'preliminary':
+#     full_images = np.load('data/processed_data/subj01/nsd_train_stim_sub1.npy').astype(np.uint8)
+#     test_images = full_images[800:1000]  # Take images 800-999 for testing
+# else:
+test_images = np.load('data/processed_data/subj01/nsd_test_stim_sub1.npy').astype(np.uint8)
 
 single_image = test_images[0:1] 
 single_image = Image.fromarray(single_image[0])

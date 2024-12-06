@@ -5,7 +5,7 @@ import pickle
 import argparse
 
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', "preliminary"], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', "LLM"], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 
@@ -13,19 +13,19 @@ print("Loading predicted captions")
 pred_captions = np.load(f'data/predicted_features/subj01/nsd_{cap_length}_captions_predtest_nsdgeneral.npy')
 
 print("Loading training captions")
-if (cap_length == 'preliminary'):
-    train_captions = np.load(f'data/caption_embeddings/subj01/preliminary_TRAIN_LLM_caption_bottleneck_embeddings_sub1.npy')
+if (cap_length == 'LLM'):
+    train_captions = np.load(f'data/caption_embeddings/subj01/final_LLM_caption_bottleneck_embeddings_sub1.npy')
 else:
     train_captions = np.load(f'data/caption_embeddings/subj01/{cap_length}er_truncated_caption_bottleneck_embeddings_sub1.npy')
 
 print("Loading VDVAE features")
-if (cap_length == 'preliminary'):
-    nsd_features = np.load(f'data/extracted_features/subj01/nsd_vdvae_features_31l.npz')
-    full_latents = nsd_features['train_latents']
-    train_latents = full_latents[:800]
-else:
-    nsd_features = np.load(f'data/extracted_features/subj01/nsd_vdvae_features_31l.npz')
-    train_latents = nsd_features['train_latents']
+# if (cap_length == 'LLM'):
+#     nsd_features = np.load(f'data/extracted_features/subj01/nsd_vdvae_features_31l.npz')
+#     full_latents = nsd_features['train_latents']
+#     train_latents = full_latents[:800]
+# else:
+nsd_features = np.load(f'data/extracted_features/subj01/nsd_vdvae_features_31l.npz')
+train_latents = nsd_features['train_latents']
 
 print('Training Caption to VDVAE Regression')
 reg = skl.Ridge(alpha=50000, max_iter=10000, fit_intercept=True)

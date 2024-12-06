@@ -16,7 +16,7 @@ os.environ['CLIP_CACHE_DIR'] = './cache/clip_cache'
 
 import argparse
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'LLM'], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 
@@ -55,10 +55,10 @@ net_list = [
 feats_dir = f'data/eval_features_{cap_length}_captions/subj01'
 test_dir = 'data/eval_features/test_images'
 
-if cap_length == 'preliminary':
-    num_test = 200  # For preliminary case, evaluate images 800-999
-else:
-    num_test = 982  # Original number of test images
+# if cap_length == 'preliminary':
+#     num_test = 200  # For preliminary case, evaluate images 800-999
+# else:
+num_test = 982  # Original number of test images
 
 distance_fn = sp.spatial.distance.correlation
 pairwise_corrs = []
@@ -78,11 +78,11 @@ results_dict = {
 }
 
 # Load test images correctly based on cap_length
-if cap_length == 'preliminary':
-    full_images = np.load('data/processed_data/subj01/nsd_train_stim_sub1.npy').astype(np.uint8)
-    test_images = full_images[800:1000]  # Take images 800-999 for testing
-else:
-    test_images = np.load('data/processed_data/subj01/nsd_test_stim_sub1.npy').astype(np.uint8)
+# if cap_length == 'preliminary':
+#     full_images = np.load('data/processed_data/subj01/nsd_train_stim_sub1.npy').astype(np.uint8)
+#     test_images = full_images[800:1000]  # Take images 800-999 for testing
+# else:
+test_images = np.load('data/processed_data/subj01/nsd_test_stim_sub1.npy').astype(np.uint8)
 
 for (net_name,layer) in net_list:
     file_name = '{}/{}_{}.npy'.format(test_dir,net_name,layer)

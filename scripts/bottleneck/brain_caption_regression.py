@@ -5,7 +5,7 @@ import pickle
 import argparse
 
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'LLM'], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 
@@ -13,9 +13,9 @@ print("Loading caption embeddings")
 
 print("Loading fMRI data")
 
-if (cap_length == 'preliminary'):
-    # for preliminary data
-    train_captions = np.load(f'data/caption_embeddings/subj01/preliminary_TRAIN_LLM_caption_bottleneck_embeddings_sub1.npy')
+if (cap_length == 'LLM'):
+    # for LLM data
+    train_captions = np.load(f'data/caption_embeddings/subj01/final_LLM_caption_bottleneck_embeddings_sub1.npy')
     full_fmri = np.load('data/processed_data/subj01/nsd_train_fmriavg_nsdgeneral_sub1.npy')
     train_fmri = full_fmri[:800] 
     test_fmri = full_fmri[800:1000]

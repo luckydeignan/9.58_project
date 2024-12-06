@@ -28,7 +28,7 @@ os.environ['TRANSFORMERS_CACHE'] = './cache/huggingface_cache'
 
 import argparse
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'preliminary'], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', 'LLM'], required=True)
 parser.add_argument("-bs", "--bs", help="Batch Size", default=30)
 parser.add_argument("-diff_str", "--diff_str", help="Diffusion Strength", default=0.75)
 parser.add_argument("-mix_str", "--mix_str", help="Mixing Strength", default=0.4)

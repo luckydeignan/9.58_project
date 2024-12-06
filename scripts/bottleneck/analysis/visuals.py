@@ -8,26 +8,26 @@ def load_metrics(caption_type):
         return json.load(f)
 
 # Load all metrics
-preliminary_metrics = load_metrics('preliminary')
+llm_metrics = load_metrics('LLM')
 short_metrics = load_metrics('short')
 long_metrics = load_metrics('long')
 
 # Extract mean values
-caption_lengths = ['Preliminary', 'Short', 'Long', 'Wang et al.']
+caption_lengths = ['LLM', 'Short', 'Long', 'Wang et al.']
 ssim_means = [
-    preliminary_metrics['image_metrics']['ssim_mean'],
+    llm_metrics['image_metrics']['ssim_mean'],
     short_metrics['image_metrics']['ssim_mean'],
     long_metrics['image_metrics']['ssim_mean'],
     0.23  # Wang et al. reference
 ]
 pixcorr_means = [
-    preliminary_metrics['image_metrics']['pixel_correlation_mean'],
+    llm_metrics['image_metrics']['pixel_correlation_mean'],
     short_metrics['image_metrics']['pixel_correlation_mean'],
     long_metrics['image_metrics']['pixel_correlation_mean'],
     0.30  # Wang et al. reference
 ]
 clip_means = [
-    preliminary_metrics['image_metrics']['clip_score_mean'],
+    llm_metrics['image_metrics']['clip_score_mean'],
     short_metrics['image_metrics']['clip_score_mean'],
     long_metrics['image_metrics']['clip_score_mean'],
     0.64  # Wang et al. reference
@@ -77,19 +77,19 @@ fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 6))
 
 # Prepare data for box plots
 ssim_data = [
-    preliminary_metrics['image_metrics']['ssim_all'],
+    llm_metrics['image_metrics']['ssim_all'],
     short_metrics['image_metrics']['ssim_all'],
     long_metrics['image_metrics']['ssim_all']
 ]
 
 pixcorr_data = [
-    preliminary_metrics['image_metrics']['pixel_correlation_all'],
+    llm_metrics['image_metrics']['pixel_correlation_all'],
     short_metrics['image_metrics']['pixel_correlation_all'],
     long_metrics['image_metrics']['pixel_correlation_all']
 ]
 
 clip_data = [
-    preliminary_metrics['image_metrics']['clip_scores_all'],
+    llm_metrics['image_metrics']['clip_scores_all'],
     short_metrics['image_metrics']['clip_scores_all'],
     long_metrics['image_metrics']['clip_scores_all']
 ]

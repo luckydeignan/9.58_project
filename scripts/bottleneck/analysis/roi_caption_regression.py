@@ -7,7 +7,7 @@ import time
 start_time = time.time()
 
 parser = argparse.ArgumentParser(description='Argument Parser')
-parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', "preliminary"], required=True)
+parser.add_argument('-cap', '--cap_length', help='Caption length (short/long)', choices=["short", 'long', "LLM"], required=True)
 args = parser.parse_args()
 cap_length = args.cap_length
 
@@ -36,9 +36,8 @@ roi_act[roi_act>0]=1
 roi_act[roi_act<0]=0
 
 print("Loading caption embeddings")
-if cap_length == 'preliminary':
-    # Load full embeddings and take first 800 samples
-    train_captions = np.load('data/caption_embeddings/subj01/preliminary_TRAIN_LLM_caption_bottleneck_embeddings_sub1.npy')
+if cap_length == 'LLM':
+    train_captions = np.load('data/caption_embeddings/subj01/final_LLM_caption_bottleneck_embeddings_sub1.npy')
 else:
     train_captions = np.load(f'data/caption_embeddings/subj01/{cap_length}er_truncated_caption_bottleneck_embeddings_sub1.npy')
 
