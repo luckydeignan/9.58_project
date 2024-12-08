@@ -111,3 +111,34 @@ ax3.set_ylabel('CLIP Score')
 plt.tight_layout()
 plt.savefig('results/reconstruction_metrics_distributions.png', dpi=300, bbox_inches='tight')
 plt.close()
+
+# Create 2x2 comparison figure
+fig, axes = plt.subplots(2, 2, figsize=(12, 12))
+
+# Load images
+original = plt.imread('results/images/original.png')
+llm = plt.imread('results/images/LLM.png')
+short = plt.imread('results/images/short-naive.png')
+long = plt.imread('results/images/long-naive.png')
+
+# Plot images
+axes[0, 0].imshow(original)
+axes[0, 0].set_title('Original Image')
+axes[0, 0].axis('off')
+
+axes[0, 1].imshow(short)
+axes[0, 1].set_title('Short Caption')
+axes[0, 1].axis('off')
+
+axes[1, 0].imshow(long)
+axes[1, 0].set_title('Long Caption')
+axes[1, 0].axis('off')
+
+axes[1, 1].imshow(llm)
+axes[1, 1].set_title('LLM Caption')
+axes[1, 1].axis('off')
+
+# Adjust layout and save
+plt.tight_layout()
+plt.savefig('results/image_comparison.png', dpi=300, bbox_inches='tight')
+plt.close()
